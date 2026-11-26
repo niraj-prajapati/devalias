@@ -3,6 +3,10 @@ import XCTest
 
 final class MDNSPublishIntegrationTests: XCTestCase {
     func testPublishMakesAliasResolvable() async throws {
+        // GitHub-hosted macOS VMs block multicast / .local resolution.
+        if ProcessInfo.processInfo.environment["CI"] == "true" {
+            throw XCTSkip("mDNS resolve not available on CI runners")
+        }
         guard let ip = LANAddressProvider.primaryIPv4() else {
             throw XCTSkip("No LAN IPv4 available for mDNS test")
         }
