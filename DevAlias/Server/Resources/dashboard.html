@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0c0d0a" />
+  <title>devalias</title>
+  <style>
+    :root {
+      --bg: #0c0d0a;
+      --panel: #12140f;
+      --line: #2a2e24;
+      --fg: #c8d4a8;
+      --dim: #6e7860;
+      --mute: #4a5240;
+      --accent: #b7f05a;
+      --accent-dim: #7aa83a;
+      --warn: #d4a017;
+      --danger: #e06c75;
+      --tap: 48px;
+      --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.45;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      padding: 16px 14px calc(24px + env(safe-area-inset-bottom));
+      -webkit-tap-highlight-color: transparent;
+      background-image:
+        linear-gradient(rgba(183, 240, 90, 0.03) 1px, transparent 1px);
+      background-size: 100% 4px;
+    }
+    .wrap { max-width: 440px; margin: 0 auto; }
+
+    .chrome {
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      color: var(--dim);
+      font-size: 11px;
+    }
+    .titlebar .brand { color: var(--accent); font-weight: 500; }
+    .titlebar .live { color: var(--dim); }
+    .titlebar .live.ok::before {
+      content: "";
+      display: inline-block;
+      width: 6px; height: 6px;
+      margin-right: 6px;
+      background: var(--accent);
+      vertical-align: middle;
+    }
+    .titlebar .live.bad { color: var(--danger); }
+    .titlebar .live.bad::before {
+      content: "";
+      display: inline-block;
+      width: 6px; height: 6px;
+      margin-right: 6px;
+      background: var(--danger);
+      vertical-align: middle;
+    }
+
+    .body { padding: 12px; }
+    .meta {
+      color: var(--dim);
+      font-size: 11px;
+      margin: 0 0 10px;
+    }
+    .meta a {
+      color: var(--accent-dim);
+      text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent-dim) 35%, transparent);
+    }
+    .meta a:active { color: var(--accent); }
+    .meta .sep { color: var(--mute); margin: 0 6px; }
+
+    .prompt-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: stretch;
+      gap: 0;
+      margin: 12px 0 16px;
+      border: 1px solid var(--line);
+      background: #0a0b08;
+    }
+    .prompt-row .ps1 {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--accent);
+      font-weight: 500;
+      font-size: 12px;
+      border-right: 1px solid var(--line);
+      user-select: none;
+    }
+    .prompt-row input {
+      min-height: var(--tap);
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      padding: 0 12px;
+      font: inherit;
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+      width: 100%;
+    }
+    .prompt-row input::placeholder { color: var(--mute); }
+    .prompt-row input:focus { outline: none; }
+    .prompt-row button {
+      min-height: var(--tap);
+      min-width: 56px;
+      border: 0;
+      border-left: 1px solid var(--line);
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .prompt-row button:active { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+    .prompt-err {
+      color: var(--danger);
+      font-size: 11px;
+      margin: -10px 0 12px;
+    }
+
+    .section-label {
+      color: var(--mute);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: lowercase;
+      margin: 0 0 8px;
+    }
+
+    #list { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--line); }
+    .row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: inherit;
+      min-height: var(--tap);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .row:last-child { border-bottom: 0; }
+    .row:active { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+    .row.blocked {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    .port {
+      color: var(--accent);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      font-size: 14px;
+    }
+    .port::before { content: ":"; color: var(--accent-dim); }
+    .info { min-width: 0; }
+    .name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .proc {
+      color: var(--dim);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stack {
+      color: var(--mute);
+      font-size: 10px;
+      text-align: right;
+      text-transform: lowercase;
+    }
+    .warn {
+      grid-column: 1 / -1;
+      color: var(--warn);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .empty, .error {
+      padding: 28px 14px;
+      color: var(--dim);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    .empty code, .error code {
+      color: var(--accent-dim);
+      font-family: inherit;
+    }
+    .error { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, var(--line)); }
+    .retry {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--fg);
+      font: inherit;
+      font-size: 12px;
+      min-height: 40px;
+    }
+
+    .foot {
+      margin-top: 12px;
+      color: var(--mute);
+      font-size: 10px;
+    }
+
+    @media (min-width: 480px) {
+      body { font-size: 13px; padding: 24px; }
+      .wrap { max-width: 520px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="chrome">
+      <div class="titlebar">
+        <span class="brand">devalias</span>
+        <span class="live" id="livePill"><span id="liveText">connecting…</span></span>
+      </div>
+      <div class="body">
+        <p class="meta" id="statusLinks">fetching hub…</p>
+
+        <form class="prompt-row" id="jumpForm" autocomplete="off">
+          <span class="ps1">port</span>
+          <input id="portInput" inputmode="numeric" pattern="[0-9]*" placeholder="5173" aria-label="Port number" />
+          <button type="submit">go</button>
+        </form>
+        <p class="prompt-err" id="jumpErr" hidden></p>
+
+        <p class="section-label">listeners</p>
+        <div id="list"><p class="empty">scanning…</p></div>
+        <p class="foot" id="foot">open uses lan ip · poll 3s</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const list = document.getElementById('list');
+    const statusLinks = document.getElementById('statusLinks');
+    const livePill = document.getElementById('livePill');
+    const liveText = document.getElementById('liveText');
+    const jumpForm = document.getElementById('jumpForm');
+    const portInput = document.getElementById('portInput');
+    const jumpErr = document.getElementById('jumpErr');
+    const foot = document.getElementById('foot');
+
+    let status = null;
+
+    function escapeHtml(v) {
+      return String(v)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+    }
+
+    function pageHost() {
+      return location.hostname;
+    }
+
+    function preferredHost() {
+      if (status && status.lanIP) return status.lanIP;
+      return pageHost();
+    }
+
+    function urlForPort(host, port) {
+      return 'http://' + host + ':' + port + '/';
+    }
+
+    function setLive(ok, message) {
+      livePill.classList.toggle('ok', ok);
+      livePill.classList.toggle('bad', !ok);
+      liveText.textContent = message;
+    }
+
+    function row(s) {
+      const title = escapeHtml(s.projectName || s.processName || 'server');
+      const stack = escapeHtml(s.stack || '?');
+      const proc = escapeHtml(s.processName || '');
+      const localhostOnly = s.accessibility === 'localhostOnly';
+      const href = urlForPort(preferredHost(), s.port);
+      const warn = localhostOnly
+        ? '<div class="warn">localhost only — bind 0.0.0.0 / --host on the Mac</div>'
+        : '';
+
+      if (localhostOnly) {
+        return (
+          '<div class="row blocked">' +
+            '<div class="port">' + s.port + '</div>' +
+            '<div class="info"><div class="name">' + title + '</div><div class="proc">' + proc + '</div>' + warn + '</div>' +
+            '<div class="stack">' + stack + '</div>' +
+          '</div>'
+        );
+      }
+
+      return (
+        '<a class="row" href="' + href + '">' +
+          '<div class="port">' + s.port + '</div>' +
+          '<div class="info"><div class="name">' + title + '</div><div class="proc">' + proc + '</div></div>' +
+          '<div class="stack">' + stack + '</div>' +
+        '</a>'
+      );
+    }
+
+    async function fetchJSON(url, ms) {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), ms);
+      try {
+        const res = await fetch(url, { cache: 'no-store', signal: ctrl.signal });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    async function refreshStatus() {
+      try {
+        status = await fetchJSON('/api/status', 4000);
+        const bits = [];
+        if (status.lanIP) {
+          bits.push('<a href="' + (status.lanURL || ('http://' + status.lanIP + '/')) + '">' + escapeHtml(status.lanIP) + '</a>');
+        }
+        if (status.alias) {
+          bits.push('<span>' + escapeHtml(status.alias) + '.local</span>');
+        }
+        if (status.highPort) {
+          bits.push('<span>hub :' + status.highPort + '</span>');
+        }
+        statusLinks.innerHTML = bits.length
+          ? bits.join('<span class="sep">│</span>')
+          : 'hub up';
+        foot.textContent = 'open → ' + preferredHost() + ' · poll 3s';
+      } catch (e) {
+        statusLinks.textContent = 'status down — use lan ip from the Mac menu';
+      }
+    }
+
+    async function refresh() {
+      try {
+        const servers = await fetchJSON('/api/ports', 5000);
+        setLive(true, 'live');
+        if (!Array.isArray(servers) || servers.length === 0) {
+          list.innerHTML =
+            '<p class="empty">no listeners<br/>start vite / next / flutter on the Mac<br/>tip: <code>--host</code> for phone reach</p>';
+          return;
+        }
+        list.innerHTML = servers.map(row).join('');
+      } catch (err) {
+        setLive(false, 'offline');
+        list.innerHTML =
+          '<div class="error">scan failed — check wifi / lan url' +
+          '<br/><button class="retry" type="button" id="retryBtn">retry</button></div>';
+        const btn = document.getElementById('retryBtn');
+        if (btn) btn.onclick = () => { refreshStatus(); refresh(); };
+      }
+    }
+
+    jumpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      jumpErr.hidden = true;
+      const raw = String(portInput.value || '').trim();
+      const port = Number(raw);
+      if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        jumpErr.textContent = 'port must be 1–65535';
+        jumpErr.hidden = false;
+        return;
+      }
+      location.href = urlForPort(preferredHost(), port);
+    });
+
+    refreshStatus();
+    refresh();
+    setInterval(() => { refreshStatus(); refresh(); }, 3000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) { refreshStatus(); refresh(); }
+    });
+  </script>
+</body>
+</html>

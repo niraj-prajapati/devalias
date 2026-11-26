@@ -1,0 +1,35 @@
+name: Discovery false positive
+description: Wrong / noisy port showing (or missing) in listeners
+labels: ["discovery"]
+body:
+  - type: input
+    id: process
+    attributes:
+      label: Process name
+      placeholder: e.g. rapportd, 2.1.330, node
+    validations:
+      required: true
+  - type: input
+    id: port
+    attributes:
+      label: Port
+      placeholder: "5173"
+    validations:
+      required: true
+  - type: dropdown
+    id: want
+    attributes:
+      label: Desired
+      options:
+        - Hide this listener
+        - Show this listener (false negative)
+        - Wrong stack / project name
+    validations:
+      required: true
+  - type: textarea
+    id: lsof
+    attributes:
+      label: lsof line
+      description: Output of `lsof -nP -iTCP:PORT -sTCP:LISTEN`
+    validations:
+      required: true

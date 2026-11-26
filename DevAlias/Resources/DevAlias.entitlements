@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		App Sandbox intentionally OFF for v1.
+		Discovery needs process/port inspection (lsof/libproc) and privileged
+		pfctl helper IPC — incompatible with Mac App Store sandbox.
+		Hardened Runtime remains ON for Developer ID notarization.
+		See docs/checklists/PERMISSIONS.md and README.md.
+	-->
+</dict>
+</plist>

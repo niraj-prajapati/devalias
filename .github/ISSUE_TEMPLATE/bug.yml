@@ -1,0 +1,38 @@
+name: Bug
+description: Something broken in hub, UI, mDNS, or pf
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks — include macOS version and whether Port 80 / Login Item are enabled.
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version
+      placeholder: "14.x / 15.x"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Optional — Settings errors, Console, curl output

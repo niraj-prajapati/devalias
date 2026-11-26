@@ -1,0 +1,67 @@
+name: DevAlias
+options:
+  bundleIdPrefix: com.nandroidex
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    STRING_CATALOG_GENERATE_SYMBOLS: YES
+    DEAD_CODE_STRIPPING: YES
+    CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER: YES
+targets:
+  DevAlias:
+    type: application
+    platform: macOS
+    sources:
+      - path: DevAlias
+        excludes:
+          - "**/.gitkeep"
+          - "Server/Resources/**"
+      - path: DevAlias/Server/Resources/dashboard.html
+        buildPhase: resources
+      - path: Scripts/install-pf-anchor.sh
+        buildPhase: resources
+      - path: Scripts/uninstall-pf-anchor.sh
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nandroidex.devalias
+        PRODUCT_NAME: DevAlias
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: DevAlias
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.developer-tools
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        # P0-S04: Menu Bar agent — no Dock icon
+        INFOPLIST_KEY_LSUIElement: YES
+        COMBINE_HIDPI_IMAGES: YES
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: DevAlias/Resources/DevAlias.entitlements
+        ENABLE_HARDENED_RUNTIME: YES
+        # Sandbox OFF (P0-S05) — required for lsof/libproc discovery + pfctl helper
+        ENABLE_APP_SANDBOX: NO
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "DevAlias serves a local dashboard on your LAN so phones on the same Wi‑Fi can open discovered servers."
+    scheme:
+      testTargets:
+        - DevAliasTests
+  DevAliasTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+        excludes:
+          - "**/.gitkeep"
+    dependencies:
+      - target: DevAlias
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nandroidex.devalias.tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic

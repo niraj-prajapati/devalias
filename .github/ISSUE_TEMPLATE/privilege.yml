@@ -1,0 +1,28 @@
+name: Privilege / Port 80
+description: pf install, admin prompt, or security concern
+labels: ["privilege"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Port 80 enable failed
+        - Port 80 remove failed
+        - Unexpected admin prompt
+        - Security concern
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Detail
+      description: Include pf error text if any. Do not paste passwords.
+    validations:
+      required: true
+  - type: textarea
+    id: anchor
+    attributes:
+      label: Anchor contents (optional)
+      description: "`cat /etc/pf.anchors/com.nandroidex.devalias` (redact IPs if needed)"

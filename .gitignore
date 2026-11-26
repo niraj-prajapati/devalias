@@ -1,0 +1,42 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# CocoaPods / Carthage (unused, ignore if appear)
+Pods/
+Carthage/Build/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Secrets / signing
+*.p12
+*.cer
+*.mobileprovision
+AuthKey_*.p8
+notarize.env
+.secrets/
+
+# Releases
+dist/
+*.dmg
+*.zip
+
+# Internal planning / phase docs — not shipped in the public tree
+docs/
