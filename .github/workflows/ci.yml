@@ -41,5 +41,6 @@ jobs:
             -configuration Debug \
             -destination 'platform=macOS' \
             test \
+            -skip-testing:DevAliasTests/MDNSPublishIntegrationTests \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_ALLOWED=YES
